@@ -778,6 +778,7 @@ class ScriptAutomation(Automation):
             variation_tags.append(f"version.{version}")
 
         run_state['docker'] = meta.get('docker', {})
+        run_state['apptainer'] = meta.get('apptainer', {})
 
         r = self._update_state_from_variations(
             i,
