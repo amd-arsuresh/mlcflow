@@ -25,7 +25,8 @@ class RunStateApptainerMergeTest(unittest.TestCase):
             "docker": docker_meta,
             "apptainer": apptainer_meta,
         }
-        return {**run_state.get("docker", {}), **run_state.get("apptainer", {})}
+        return {**run_state.get("docker", {}), **
+                run_state.get("apptainer", {})}
 
     def test_apptainer_base_image_overrides_docker(self):
         settings = self._merged_settings(
@@ -72,7 +73,9 @@ class ApptainerDockerCliFallbackTest(unittest.TestCase):
         )
 
     def test_apptainer_prefix_wins(self):
-        val = self._lookup("os", {"apptainer_os": "debian", "docker_os": "centos"}, {})
+        val = self._lookup(
+            "os", {
+                "apptainer_os": "debian", "docker_os": "centos"}, {})
         self.assertEqual(val, "debian")
 
     def test_docker_prefix_fallback(self):
@@ -88,14 +91,19 @@ class ApptainerDockerCliFallbackTest(unittest.TestCase):
         self.assertEqual(val, "alpine")
 
     def test_noregenerate_docker_fallback(self):
-        # apptainer_run uses: not i.get('apptainer_noregenerate', i.get('docker_noregenerate', False))
+        # apptainer_run uses: not i.get('apptainer_noregenerate',
+        # i.get('docker_noregenerate', False))
         i = {"docker_noregenerate": True}
-        regenerate_def_file = not i.get("apptainer_noregenerate", i.get("docker_noregenerate", False))
+        regenerate_def_file = not i.get(
+            "apptainer_noregenerate", i.get(
+                "docker_noregenerate", False))
         self.assertFalse(regenerate_def_file)
 
     def test_noregenerate_apptainer_overrides_docker(self):
         i = {"apptainer_noregenerate": False, "docker_noregenerate": True}
-        regenerate_def_file = not i.get("apptainer_noregenerate", i.get("docker_noregenerate", False))
+        regenerate_def_file = not i.get(
+            "apptainer_noregenerate", i.get(
+                "docker_noregenerate", False))
         self.assertTrue(regenerate_def_file)
 
     def test_rebuild_docker_fallback(self):
@@ -156,13 +164,13 @@ class MetaSchemaApptainerKeyTest(unittest.TestCase):
         self.assertEqual(errors, [])
 
     def test_apptainer_base_image_str_accepted(self):
-        errors, _ = self._validate({"apptainer": {"base_image": "ubuntu:22.04"}})
+        errors, _ = self._validate(
+            {"apptainer": {"base_image": "ubuntu:22.04"}})
         self.assertEqual(errors, [])
 
 
 if __name__ == "__main__":
     unittest.main()
-
 
 
 # ---------------------------------------------------------------------------
@@ -194,7 +202,8 @@ class CliHelpSmokeTest(unittest.TestCase):
         return result
 
     def test_mlcd_help_exits_successfully(self):
-        import subprocess, sys
+        import subprocess
+        import sys
         result = subprocess.run(
             [sys.executable, "-c",
              "import sys; sys.argv=['mlcd','--help']; "
@@ -206,7 +215,8 @@ class CliHelpSmokeTest(unittest.TestCase):
                       msg=f"Expected docker help text, got: {combined[:500]}")
 
     def test_mlca_help_exits_successfully(self):
-        import subprocess, sys
+        import subprocess
+        import sys
         result = subprocess.run(
             [sys.executable, "-c",
              "import sys; sys.argv=['mlca','--help']; "
@@ -219,7 +229,8 @@ class CliHelpSmokeTest(unittest.TestCase):
 
     def test_mlca_help_mentions_docker_fallback(self):
         """mlca --help documents that --docker_X options are accepted."""
-        import subprocess, sys
+        import subprocess
+        import sys
         result = subprocess.run(
             [sys.executable, "-c",
              "import sys; sys.argv=['mlca','--help']; "
