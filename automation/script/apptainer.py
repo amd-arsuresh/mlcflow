@@ -8,7 +8,8 @@ import copy
 
 def apptainerfile(self_module, input_params):
 
-    # Step 1: Prune and prepare input (remove both apptainer_ and docker_ prefixed keys)
+    # Step 1: Prune and prepare input (remove both apptainer_ and docker_
+    # prefixed keys)
     prune_result = prune_input(
         {'input': input_params, 'extra_keys_starts_with': ['apptainer_', 'docker_']})
     if prune_result['return'] > 0:
@@ -217,11 +218,16 @@ def apptainer_run(self_module, i):
     if quiet:
         env['MLC_QUIET'] = 'yes'
 
-    regenerate_def_file = not i.get('apptainer_noregenerate', i.get('docker_noregenerate', False))
-    rebuild_apptainer_image = i.get('apptainer_rebuild', i.get('docker_rebuild', False))
+    regenerate_def_file = not i.get(
+        'apptainer_noregenerate', i.get(
+            'docker_noregenerate', False))
+    rebuild_apptainer_image = i.get(
+        'apptainer_rebuild', i.get(
+            'docker_rebuild', False))
 
     # Prune unnecessary Apptainer- and Docker-related input keys
-    r = prune_input({'input': i, 'extra_keys_starts_with': ['apptainer_', 'docker_']})
+    r = prune_input(
+        {'input': i, 'extra_keys_starts_with': ['apptainer_', 'docker_']})
     f_run_cmd = r['new_input']
 
     # Save current directory and prepare to search for scripts

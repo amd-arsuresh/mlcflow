@@ -57,7 +57,9 @@ class RunStateApptainerKeyTest(unittest.TestCase):
             'apptainer': {'base_image': 'docker://ubuntu:20.04'},
         }
         run_state = self._apply_meta_to_run_state(meta)
-        self.assertEqual(run_state['apptainer']['base_image'], 'docker://ubuntu:20.04')
+        self.assertEqual(
+            run_state['apptainer']['base_image'],
+            'docker://ubuntu:20.04')
         effective = self._effective_settings(run_state)
         self.assertEqual(effective['base_image'], 'docker://ubuntu:20.04')
         self.assertEqual(effective['os'], 'ubuntu')
@@ -87,9 +89,12 @@ class RunStateApptainerKeyTest(unittest.TestCase):
 
     def test_init_run_state_seeds_apptainer_key(self):
         """init_run_state in module.py must initialise run_state['apptainer'] to {}."""
-        import sys, importlib.util, os
+        import sys
+        import importlib.util
+        import os
 
-        # Load automation/utils.py as 'utils' so module.py can do `from utils import *`
+        # Load automation/utils.py as 'utils' so module.py can do `from utils
+        # import *`
         automation_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), 'automation')
         utils_spec = importlib.util.spec_from_file_location(
@@ -98,7 +103,8 @@ class RunStateApptainerKeyTest(unittest.TestCase):
         sys.modules.setdefault('utils', utils_mod)
         utils_spec.loader.exec_module(utils_mod)
 
-        # Also add automation/script to sys.path so `from script.X import *` works
+        # Also add automation/script to sys.path so `from script.X import *`
+        # works
         script_path = os.path.join(automation_path, 'script')
         for p in [automation_path, script_path]:
             if p not in sys.path:
@@ -133,7 +139,9 @@ class ApptainerDockerCliFallbackTest(unittest.TestCase):
         )
 
     def test_apptainer_prefix_wins(self):
-        val = self._lookup("os", {"apptainer_os": "debian", "docker_os": "centos"}, {})
+        val = self._lookup(
+            "os", {
+                "apptainer_os": "debian", "docker_os": "centos"}, {})
         self.assertEqual(val, "debian")
 
     def test_docker_prefix_fallback(self):
@@ -150,12 +158,16 @@ class ApptainerDockerCliFallbackTest(unittest.TestCase):
 
     def test_noregenerate_docker_fallback(self):
         i = {"docker_noregenerate": True}
-        regenerate_def_file = not i.get("apptainer_noregenerate", i.get("docker_noregenerate", False))
+        regenerate_def_file = not i.get(
+            "apptainer_noregenerate", i.get(
+                "docker_noregenerate", False))
         self.assertFalse(regenerate_def_file)
 
     def test_noregenerate_apptainer_overrides_docker(self):
         i = {"apptainer_noregenerate": False, "docker_noregenerate": True}
-        regenerate_def_file = not i.get("apptainer_noregenerate", i.get("docker_noregenerate", False))
+        regenerate_def_file = not i.get(
+            "apptainer_noregenerate", i.get(
+                "docker_noregenerate", False))
         self.assertTrue(regenerate_def_file)
 
     def test_rebuild_docker_fallback(self):
@@ -215,7 +227,8 @@ class MetaSchemaApptainerKeyTest(unittest.TestCase):
         self.assertEqual(errors, [])
 
     def test_apptainer_base_image_str_accepted(self):
-        errors, _ = self._validate({"apptainer": {"base_image": "ubuntu:22.04"}})
+        errors, _ = self._validate(
+            {"apptainer": {"base_image": "ubuntu:22.04"}})
         self.assertEqual(errors, [])
 
 
@@ -227,7 +240,8 @@ class CliHelpSmokeTest(unittest.TestCase):
     """mlcd and mlca --help exit cleanly and include expected content."""
 
     def test_mlcd_help_exits_successfully(self):
-        import subprocess, sys
+        import subprocess
+        import sys
         result = subprocess.run(
             [sys.executable, "-c",
              "import sys; sys.argv=['mlcd','--help']; "
@@ -239,7 +253,8 @@ class CliHelpSmokeTest(unittest.TestCase):
                       msg=f"Expected docker help text, got: {combined[:500]}")
 
     def test_mlca_help_exits_successfully(self):
-        import subprocess, sys
+        import subprocess
+        import sys
         result = subprocess.run(
             [sys.executable, "-c",
              "import sys; sys.argv=['mlca','--help']; "
@@ -252,7 +267,8 @@ class CliHelpSmokeTest(unittest.TestCase):
 
     def test_mlca_help_mentions_docker_fallback(self):
         """mlca --help documents that --docker_X options are accepted."""
-        import subprocess, sys
+        import subprocess
+        import sys
         result = subprocess.run(
             [sys.executable, "-c",
              "import sys; sys.argv=['mlca','--help']; "
