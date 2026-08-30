@@ -464,9 +464,10 @@ Main Script Meta:""")
     7. --apptainer_run_override / --docker_run_override:
        Force apptainer execution even if 'run' is set to False in script meta.
 
-    All --docker_X options are accepted and used as defaults when the
-    corresponding --apptainer_X option is not provided. This allows sharing
-    flags between mlcd and mlca invocations.
+    All --docker_X options listed above are accepted as defaults when the
+    corresponding --apptainer_X option is not provided. Docker-only options
+    (e.g. --docker_dt, --docker_cache, --docker_shm_size) are not applicable
+    to Apptainer and are ignored.
 
     Script meta.yaml keys:
     - ``docker``: base container settings (used by both mlcd and mlca).

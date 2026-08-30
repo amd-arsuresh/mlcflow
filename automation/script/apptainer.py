@@ -56,7 +56,9 @@ def apptainerfile(self_module, input_params):
 
     run_state = self_module.run_state
 
-    apptainer_settings = {**run_state.get('docker', {}), **run_state.get('apptainer', {})}
+    apptainer_settings = copy.deepcopy(run_state.get('docker', {}))
+    utils.merge_dicts({'dict1': apptainer_settings, 'dict2': run_state.get('apptainer', {}),
+                       'append_lists': True, 'append_unique': True})
     apptainer_settings_default_env = apptainer_settings.get('default_env', {})
     for key in apptainer_settings_default_env:
         env.setdefault(key, apptainer_settings_default_env[key])
@@ -86,7 +88,9 @@ def apptainerfile(self_module, input_params):
     if update_state_result['return'] > 0:
         return update_state_result
 
-    apptainer_settings = {**run_state.get('docker', {}), **run_state.get('apptainer', {})}
+    apptainer_settings = copy.deepcopy(run_state.get('docker', {}))
+    utils.merge_dicts({'dict1': apptainer_settings, 'dict2': run_state.get('apptainer', {}),
+                       'append_lists': True, 'append_unique': True})
 
     # Prune temporary environment variables
     run_command = copy.deepcopy(run_command_arc)
@@ -273,7 +277,9 @@ def apptainer_run(self_module, i):
 
     run_state = self_module.run_state
 
-    apptainer_settings = {**run_state.get('docker', {}), **run_state.get('apptainer', {})}
+    apptainer_settings = copy.deepcopy(run_state.get('docker', {}))
+    utils.merge_dicts({'dict1': apptainer_settings, 'dict2': run_state.get('apptainer', {}),
+                       'append_lists': True, 'append_unique': True})
 
     apptainer_settings_default_env = apptainer_settings.get('default_env', {})
     for key in apptainer_settings_default_env:
@@ -443,19 +449,15 @@ def prepare_apptainer_inputs(input_params, apptainer_settings,
             "network", "security_opt"
         ]
 
-    # Collect inputs
-    apptainer_inputs = {
-        key: input_params.get(
+    # Collect inputs: apptainer_X > docker_X > meta settings > default
+    apptainer_inputs = {}
+    for key in keys:
+        value = input_params.get(
             f"apptainer_{key}",
             input_params.get(
-                f"docker_{key}", apptainer_settings.get(
-                    key, get_apptainer_default(key))))
-        for key in keys
-        if (value := input_params.get(
-            f"apptainer_{key}",
-            input_params.get(
-                f"docker_{key}", apptainer_settings.get(key, get_apptainer_default(key))))) is not None
-    }
+                f"docker_{key}", apptainer_settings.get(key, get_apptainer_default(key))))
+        if value is not None:
+            apptainer_inputs[key] = value
 
     # Convert boolean values to 'yes'/'no' strings for MLC input mapping
     for key in list(apptainer_inputs.keys()):

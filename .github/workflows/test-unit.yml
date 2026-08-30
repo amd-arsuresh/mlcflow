@@ -7,19 +7,19 @@ on:
   pull_request:
     branches: [ "main", "dev" ]
     paths:
-      - mlc/**
-      - tests/**
-      - automation/**
+      - 'mlc/**'
+      - 'tests/**'
+      - 'automation/**'
       - '.github/workflows/test-unit.yml'
-      - pyproject.toml
+      - 'pyproject.toml'
   push:
     branches: [ "main", "dev" ]
     paths:
-      - mlc/**
-      - tests/**
-      - automation/**
+      - 'mlc/**'
+      - 'tests/**'
+      - 'automation/**'
       - '.github/workflows/test-unit.yml'
-      - pyproject.toml
+      - 'pyproject.toml'
 
 jobs:
   unit-tests:
