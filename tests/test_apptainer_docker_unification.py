@@ -163,3 +163,71 @@ class MetaSchemaApptainerKeyTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
+
+
+# ---------------------------------------------------------------------------
+# 5. CLI smoke tests: mlcd --help and mlca --help
+# ---------------------------------------------------------------------------
+
+class CliHelpSmokeTest(unittest.TestCase):
+    """mlcd and mlca --help exit cleanly and include expected content."""
+
+    def _run_help(self, entry_point):
+        import subprocess
+        import sys
+        result = subprocess.run(
+            [sys.executable, "-m", entry_point, "--help"],
+            capture_output=True, text=True
+        )
+        return result
+
+    def _run_mlc_action_help(self, action):
+        """Use 'mlc <action> script --help' as the canonical help path."""
+        import subprocess
+        import sys
+        result = subprocess.run(
+            [sys.executable, "-c",
+             f"import sys; sys.argv=['mlc', '{action}', 'script', '--help']; "
+             f"from mlc.main import main; main()"],
+            capture_output=True, text=True
+        )
+        return result
+
+    def test_mlcd_help_exits_successfully(self):
+        import subprocess, sys
+        result = subprocess.run(
+            [sys.executable, "-c",
+             "import sys; sys.argv=['mlcd','--help']; "
+             "from mlc.main import mlcd; mlcd()"],
+            capture_output=True, text=True
+        )
+        combined = result.stdout + result.stderr
+        self.assertIn("docker", combined.lower(),
+                      msg=f"Expected docker help text, got: {combined[:500]}")
+
+    def test_mlca_help_exits_successfully(self):
+        import subprocess, sys
+        result = subprocess.run(
+            [sys.executable, "-c",
+             "import sys; sys.argv=['mlca','--help']; "
+             "from mlc.main import mlca; mlca()"],
+            capture_output=True, text=True
+        )
+        combined = result.stdout + result.stderr
+        self.assertIn("apptainer", combined.lower(),
+                      msg=f"Expected apptainer help text, got: {combined[:500]}")
+
+    def test_mlca_help_mentions_docker_fallback(self):
+        """mlca --help documents that --docker_X options are accepted."""
+        import subprocess, sys
+        result = subprocess.run(
+            [sys.executable, "-c",
+             "import sys; sys.argv=['mlca','--help']; "
+             "from mlc.main import mlca; mlca()"],
+            capture_output=True, text=True
+        )
+        combined = result.stdout + result.stderr
+        self.assertIn("docker_rebuild", combined,
+                      msg=f"Expected docker_rebuild in mlca help, got: {combined[:500]}")
+        self.assertIn("docker_noregenerate", combined,
+                      msg=f"Expected docker_noregenerate in mlca help, got: {combined[:500]}")
